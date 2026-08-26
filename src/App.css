@@ -24,3 +24,8 @@ body {
     box-shadow: 0 2px 5px lightgray;
 
 }
+
+.footer {
+  background-color: navy;
+  color: white;
+}
