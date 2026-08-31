@@ -5,7 +5,7 @@ const concepts = [
 	{
 		number: "01",
 		title: "Rules over replicas",
-		description: "Design a small set of constraints and let the system discover the rest.",
+		description: "Type in a random seed and let the system discover and build the rest.",
 	},
 	{
 		number: "02",
@@ -19,9 +19,11 @@ const concepts = [
 	},
 ];
 
-const seeds = ["MOSS-7F2A", "NOVA-318C", "RUNE-94D1"];
+const seeds = ["10973442", "89237121", "97283718", "12345678", "87654321", "31415926", "27182818", "16180339", "14142135", "17320508"];
 
+// Creates individual world elements (trees, ponds, animals) positioned on the globe's surface
 function addWorldDetail(parent, type, latitude, longitude, size) {
+	// Convert latitude/longitude to 3D position on the sphere surface
 	const radius = 1.37;
 	const position = new THREE.Vector3(
 		radius * Math.cos(latitude) * Math.cos(longitude),
@@ -30,8 +32,10 @@ function addWorldDetail(parent, type, latitude, longitude, size) {
 	);
 	const detail = new THREE.Group();
 	detail.position.copy(position);
+	// Orient the object to face outward from the sphere center
 	detail.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), position.clone().normalize());
 
+	// Build different geometry based on detail type
 	if (type === "tree") {
 		const trunk = new THREE.Mesh(new THREE.CylinderGeometry(size * .12, size * .16, size * .7, 6), new THREE.MeshStandardMaterial({ color: 0x704f3e, roughness: 1 }));
 		trunk.position.y = size * .35;
@@ -54,6 +58,7 @@ function addWorldDetail(parent, type, latitude, longitude, size) {
 	parent.add(detail);
 }
 
+// Main component that renders the interactive 3D procedural world
 function ProceduralVisualizer() {
 	const [seedIndex, setSeedIndex] = useState(0);
 	const [displayedSeed, setDisplayedSeed] = useState("");
@@ -74,7 +79,9 @@ function ProceduralVisualizer() {
 		const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 		const world = new THREE.Group();
 		const details = new THREE.Group();
-		const seedValue = [...seed].reduce((total, character) => total + character.charCodeAt(0), 0);
+	// Convert seed string to a numeric value for seeding randomness
+	const seedValue = [...seed].reduce((total, character) => total + character.charCodeAt(0), 0);
+	// Handle canvas resize and maintain correct aspect ratio
 		const resize = () => {
 			const { width, height } = canvas.getBoundingClientRect();
 			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -98,9 +105,11 @@ function ProceduralVisualizer() {
 			const x = positions.getX(index);
 			const y = positions.getY(index);
 			const z = positions.getZ(index);
-			const noise = Math.sin(x * 5 + seedValue) * Math.cos(y * 6 - seedValue) + Math.sin(z * 8 + seedValue * 0.3);
-			const elevation = noise / 3;
-			const color = elevation < -0.12 ? new THREE.Color("#548c91") : elevation > 0.22 ? new THREE.Color("#d7835b") : new THREE.Color("#6d9972");
+			// Generate procedural noise per vertex based on position and seed
+		const noise = Math.sin(x * 5 + seedValue) * Math.cos(y * 6 - seedValue) + Math.sin(z * 8 + seedValue * 0.3);
+		const elevation = noise / 3;
+		// Color vertices based on elevation: blue for water, coral for mountains, green for land
+		const color = elevation < -0.12 ? new THREE.Color("#548c91") : elevation > 0.22 ? new THREE.Color("#d7835b") : new THREE.Color("#6d9972");
 			colors.push(color.r, color.g, color.b);
 		}
 		globeGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
@@ -109,23 +118,28 @@ function ProceduralVisualizer() {
 
 		const outline = new THREE.LineSegments(new THREE.EdgesGeometry(globeGeometry, 35), new THREE.LineBasicMaterial({ color: 0xc2e0c5, transparent: true, opacity: .28 }));
 		world.add(outline);
+		// Add a subtle rotating accent halo around the globe
 		const halo = new THREE.Mesh(new THREE.TorusGeometry(1.65, .012, 8, 96), new THREE.MeshBasicMaterial({ color: 0xe36f4f, transparent: true, opacity: .42 }));
 		halo.rotation.x = Math.PI / 2.8;
 		world.add(halo);
 
+		// Create a seeded random number generator from the seed value
 		let random = (seedValue % 997) / 997;
 		const nextRandom = () => {
 			random = (random * 9301 + 49297) % 233280;
 			return random / 233280;
 		};
+		// Generate trees and ponds scattered across the globe surface
 		for (let index = 0; index < 13; index += 1) {
 			const latitude = -.18 + nextRandom() * 1.05;
 			const longitude = nextRandom() * Math.PI * 2;
 			addWorldDetail(details, index % 5 === 0 ? "pond" : "tree", latitude, longitude, .11 + nextRandom() * .04);
 		}
+		// Add a few animals scattered around the world
 		for (let index = 0; index < 4; index += 1) {
 			addWorldDetail(details, "animal", .05 + nextRandom() * .72, nextRandom() * Math.PI * 2, .1);
 		}
+		// Start details as invisible; they will fade in during generation
 		details.scale.setScalar(0);
 
 		resize();
@@ -134,16 +148,20 @@ function ProceduralVisualizer() {
 		let previousTime = performance.now();
 		let elapsed = 0;
 		let frame;
+		// Animation loop: rotate the globe and scale details in/out based on generation phase
 		const animate = () => {
 			const currentTime = performance.now();
 			elapsed += (currentTime - previousTime) / 1000;
 			previousTime = currentTime;
+			// Rotate the world (unless user prefers reduced motion)
 			if (!reduceMotion) {
 				world.rotation.y = elapsed * .42;
 				world.rotation.z = Math.sin(elapsed * .3) * .06;
 			}
+			// Scale globe slightly during generation phase for visual feedback
 			const targetScale = phaseRef.current === "generating" ? 1.08 : 1;
 			world.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), .025);
+			// Fade in world details (trees, ponds, animals) after seed is complete
 			const detailScale = phaseRef.current === "typing" ? 0 : 1;
 			details.scale.lerp(new THREE.Vector3(detailScale, detailScale, detailScale), .035);
 			renderer.render(scene, camera);
@@ -170,10 +188,12 @@ function ProceduralVisualizer() {
 		};
 	}, [seed]);
 
+	// Manage seed typing animation and phase transitions
 	useEffect(() => {
 		let timeout;
 		let character = 0;
 
+		// Type seed text one character at a time
 		const typeSeed = () => {
 			if (character < seed.length) {
 				character += 1;
@@ -182,6 +202,7 @@ function ProceduralVisualizer() {
 				return;
 			}
 
+			// After seed is fully typed, transition to generation phase
 			setPhase("generating");
 			timeout = setTimeout(() => setPhase("ready"), 1900);
 		};
@@ -191,9 +212,11 @@ function ProceduralVisualizer() {
 			setPhase("typing");
 			typeSeed();
 		}, 380);
-		return () => clearTimeout(timeout);
+	return () => clearTimeout(timeout);
 	}, [seed]);
 
+	// Cycle through different seeds to show procedural variety
+	// Cycle through different seeds to demonstrate procedural variety
 	useEffect(() => {
 		const loop = setTimeout(() => setSeedIndex((current) => (current + 1) % seeds.length), 7800);
 		return () => clearTimeout(loop);
@@ -228,7 +251,7 @@ function Home() {
 				<div className="hero-copy">
 					<p className="eyebrow"><span /> A field guide to making by rules</p>
 					<h1>Let the <em>system</em><br />surprise you.</h1>
-					<p className="hero-intro">Procedural generation turns a handful of instructions into endless possibility. It is code as a collaborator: precise enough to guide, unpredictable enough to inspire.</p>
+					<p className="hero-intro">Procedural generation turns a handful of instructions, or a seed, into endless possibility. It is code as a collaborator: precise enough to guide, unpredictable enough to inspire.</p>
 					<a className="primary-button" href="#definition">Start with the idea <span aria-hidden="true">↓</span></a>
 				</div>
 				<ProceduralVisualizer />
@@ -238,7 +261,7 @@ function Home() {
 				<p className="section-kicker">The short version</p>
 				<div className="definition-content">
 					<h2>So, what is <span>procedural generation?</span></h2>
-					<p className="definition-copy">Procedural generation is the practice of creating content algorithmically rather than by hand. A designer defines the rules, inputs, and boundaries; a computer uses them to produce unique outcomes, from game landscapes and music to textures, stories, and entire galaxies.</p>
+					<p className="definition-copy">Procedural generation is the practice of creating content algorithmically rather than by hand. A designer defines the rules, inputs, and boundaries; a computer uses the seed to produce unique outcomes, from game landscapes and music to textures, stories, and entire galaxies. Some games that use procedural generation include Minecraft, Dwarf Fortress, and No Man's Sky.</p>
 				</div>
 			</section>
 
