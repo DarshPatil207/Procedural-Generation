@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+import { useEffect, useState } from "react";
 
 const concepts = [
 	{
@@ -21,212 +20,78 @@ const concepts = [
 
 const seeds = ["10973442", "89237121", "97283718", "12345678", "87654321", "31415926", "27182818", "16180339", "14142135", "17320508"];
 
-// Creates individual world elements (trees, ponds, animals) positioned on the globe's surface
-function addWorldDetail(parent, type, latitude, longitude, size) {
-	// Convert latitude/longitude to 3D position on the sphere surface
-	const radius = 1.37;
-	const position = new THREE.Vector3(
-		radius * Math.cos(latitude) * Math.cos(longitude),
-		radius * Math.sin(latitude),
-		radius * Math.cos(latitude) * Math.sin(longitude),
-	);
-	const detail = new THREE.Group();
-	detail.position.copy(position);
-	// Orient the object to face outward from the sphere center
-	detail.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), position.clone().normalize());
-
-	// Build different geometry based on detail type
-	if (type === "tree") {
-		const trunk = new THREE.Mesh(new THREE.CylinderGeometry(size * .12, size * .16, size * .7, 6), new THREE.MeshStandardMaterial({ color: 0x704f3e, roughness: 1 }));
-		trunk.position.y = size * .35;
-		const crown = new THREE.Mesh(new THREE.ConeGeometry(size * .55, size, 7), new THREE.MeshStandardMaterial({ color: 0x467456, roughness: .95 }));
-		crown.position.y = size * .95;
-		detail.add(trunk, crown);
-	} else if (type === "pond") {
-		const pond = new THREE.Mesh(new THREE.SphereGeometry(size, 16, 8), new THREE.MeshStandardMaterial({ color: 0x63a3a5, roughness: .25, metalness: .05 }));
-		pond.scale.set(1.8, .08, 1.15);
-		detail.add(pond);
-	} else {
-		const body = new THREE.Mesh(new THREE.SphereGeometry(size * .35, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd7835b, roughness: .9 }));
-		body.position.y = size * .3;
-		body.scale.set(1.4, .8, .8);
-		const head = new THREE.Mesh(new THREE.SphereGeometry(size * .24, 8, 6), body.material);
-		head.position.set(size * .35, size * .45, 0);
-		detail.add(body, head);
-	}
-
-	parent.add(detail);
+// Turn a seed into repeatable 2D positions so every generated map is unique but reproducible
+function createWorld(seed) {
+	let random = [...seed].reduce((total, character) => total + character.charCodeAt(0), 0);
+	const nextRandom = () => {
+		random = (random * 9301 + 49297) % 233280;
+		return random / 233280;
+	};
+	return {
+		trees: Array.from({ length: 11 }, (_, index) => ({ x: 78 + nextRandom() * 290, y: 65 + nextRandom() * 138, delay: index * 65 })),
+		ponds: Array.from({ length: 3 }, (_, index) => ({ x: 95 + nextRandom() * 265, y: 76 + nextRandom() * 120, delay: index * 130 })),
+		animals: Array.from({ length: 4 }, (_, index) => ({ x: 88 + nextRandom() * 285, y: 75 + nextRandom() * 125, delay: index * 170 })),
+	};
 }
 
-// Main component that renders the interactive 3D procedural world
+// Main component that renders the interactive 2D procedural world
 function ProceduralVisualizer() {
 	const [seedIndex, setSeedIndex] = useState(0);
 	const [displayedSeed, setDisplayedSeed] = useState("");
 	const [phase, setPhase] = useState("typing");
-	const canvasRef = useRef(null);
-	const phaseRef = useRef(phase);
 	const seed = seeds[seedIndex];
-
-	useEffect(() => {
-		phaseRef.current = phase;
-	}, [phase]);
-
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-		const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-		const world = new THREE.Group();
-		const details = new THREE.Group();
-		// Convert seed string to a numeric value for seeding randomness
-		const seedValue = [...seed].reduce((total, character) => total + character.charCodeAt(0), 0);
-		// Handle canvas resize and maintain correct aspect ratio
-		const resize = () => {
-			const { width, height } = canvas.getBoundingClientRect();
-			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-			renderer.setSize(width, height, false);
-			camera.aspect = width / height;
-			camera.updateProjectionMatrix();
-		};
-
-		camera.position.z = 4.6;
-		scene.add(world);
-		world.add(details);
-		scene.add(new THREE.AmbientLight(0xb8d0be, 2.1));
-		const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
-		keyLight.position.set(-3, 4, 4);
-		scene.add(keyLight);
-
-		const globeGeometry = new THREE.SphereGeometry(1.35, 48, 32);
-		const positions = globeGeometry.attributes.position;
-		const colors = [];
-		for (let index = 0; index < positions.count; index += 1) {
-			const x = positions.getX(index);
-			const y = positions.getY(index);
-			const z = positions.getZ(index);
-			// Generate procedural noise per vertex based on position and seed
-			const noise = Math.sin(x * 5 + seedValue) * Math.cos(y * 6 - seedValue) + Math.sin(z * 8 + seedValue * 0.3);
-			const elevation = noise / 3;
-			// Color vertices based on elevation: blue for water, coral for mountains, green for land
-			const color = elevation < -0.12 ? new THREE.Color("#548c91") : elevation > 0.22 ? new THREE.Color("#d7835b") : new THREE.Color("#6d9972");
-			colors.push(color.r, color.g, color.b);
-		}
-		globeGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
-		const globe = new THREE.Mesh(globeGeometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .9, flatShading: true }));
-		world.add(globe);
-
-		const outline = new THREE.LineSegments(new THREE.EdgesGeometry(globeGeometry, 35), new THREE.LineBasicMaterial({ color: 0xc2e0c5, transparent: true, opacity: .28 }));
-		world.add(outline);
-		// Add a subtle rotating accent halo around the globe
-		const halo = new THREE.Mesh(new THREE.TorusGeometry(1.65, .012, 8, 96), new THREE.MeshBasicMaterial({ color: 0xe36f4f, transparent: true, opacity: .42 }));
-		halo.rotation.x = Math.PI / 2.8;
-		world.add(halo);
-
-		// Create a seeded random number generator from the seed value
-		let random = (seedValue % 997) / 997;
-		const nextRandom = () => {
-			random = (random * 9301 + 49297) % 233280;
-			return random / 233280;
-		};
-		// Generate trees and ponds scattered across the globe surface
-		for (let index = 0; index < 13; index += 1) {
-			const latitude = -.18 + nextRandom() * 1.05;
-			const longitude = nextRandom() * Math.PI * 2;
-			addWorldDetail(details, index % 5 === 0 ? "pond" : "tree", latitude, longitude, .11 + nextRandom() * .04);
-		}
-		// Add a few animals scattered around the world
-		for (let index = 0; index < 4; index += 1) {
-			addWorldDetail(details, "animal", .05 + nextRandom() * .72, nextRandom() * Math.PI * 2, .1);
-		}
-		// Start details as invisible; they will fade in during generation
-		details.scale.setScalar(0);
-
-		resize();
-		const observer = new ResizeObserver(resize);
-		observer.observe(canvas);
-		let previousTime = performance.now();
-		let elapsed = 0;
-		let frame;
-		// Animation loop: rotate the globe and scale details in/out based on generation phase
-		const animate = () => {
-			const currentTime = performance.now();
-			elapsed += (currentTime - previousTime) / 1000;
-			previousTime = currentTime;
-			// Rotate the world (unless user prefers reduced motion)
-			if (!reduceMotion) {
-				world.rotation.y = elapsed * .42;
-				world.rotation.z = Math.sin(elapsed * .3) * .06;
-			}
-			// Scale globe slightly during generation phase for visual feedback
-			const targetScale = phaseRef.current === "generating" ? 1.08 : 1;
-			world.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), .025);
-			// Fade in world details (trees, ponds, animals) after seed is complete
-			const detailScale = phaseRef.current === "typing" ? 0 : 1;
-			details.scale.lerp(new THREE.Vector3(detailScale, detailScale, detailScale), .035);
-			renderer.render(scene, camera);
-			frame = requestAnimationFrame(animate);
-		};
-		animate();
-
-		return () => {
-			cancelAnimationFrame(frame);
-			observer.disconnect();
-			globeGeometry.dispose();
-			globe.material.dispose();
-			details.traverse((object) => {
-				if (object.isMesh) {
-					object.geometry.dispose();
-					object.material.dispose();
-				}
-			});
-			outline.geometry.dispose();
-			outline.material.dispose();
-			halo.geometry.dispose();
-			halo.material.dispose();
-			renderer.dispose();
-		};
-	}, [seed]);
+	const world = createWorld(seed);
+	// Keep newly mounted worlds hidden until their own seed has finished typing
+	const visualPhase = displayedSeed === seed ? phase : "typing";
 
 	// Manage seed typing animation and phase transitions
 	useEffect(() => {
 		let timeout;
 		let character = 0;
 
+		// Run one complete seed cycle before moving to the next world
+		const startCycle = () => {
+			setDisplayedSeed("");
+			setPhase("typing");
+			typeSeed();
+		};
+
 		// Type seed text one character at a time
 		const typeSeed = () => {
 			if (character < seed.length) {
 				character += 1;
 				setDisplayedSeed(seed.slice(0, character));
-				timeout = setTimeout(typeSeed, 145);
+				timeout = setTimeout(typeSeed, 170);
 				return;
 			}
 
 			// After seed is fully typed, transition to generation phase
 			setPhase("generating");
-			timeout = setTimeout(() => setPhase("ready"), 1900);
+			timeout = setTimeout(() => {
+				setPhase("ready");
+				timeout = setTimeout(() => setSeedIndex((current) => (current + 1) % seeds.length), 1800);
+			}, 2200);
 		};
 
-		timeout = setTimeout(() => {
-			setDisplayedSeed("");
-			setPhase("typing");
-			typeSeed();
-		}, 380);
+		timeout = setTimeout(startCycle, 250);
 		return () => clearTimeout(timeout);
 	}, [seed]);
 
-	// Cycle through different seeds to demonstrate procedural variety
-	useEffect(() => {
-		const loop = setTimeout(() => setSeedIndex((current) => (current + 1) % seeds.length), 7800);
-		return () => clearTimeout(loop);
-	}, [seedIndex]);
-
 	return (
-		<div className={`hero-art phase-${phase}`} aria-label="Animation showing a seed generating a 3D world" role="img">
+		<div className={`hero-art phase-${visualPhase}`} aria-label="Animation showing a seed generating a 2D world" role="img">
 			<div className="art-header"><span><i /> GENERATOR / LIVE</span><span>RUN 0{seedIndex + 1}</span></div>
-			<div className="seed-console"><span className="prompt">seed://</span><span>{displayedSeed}</span><span className="cursor" />{phase === "ready" && <span className="status">locked</span>}</div>
-			<div className="world-stage"><canvas ref={canvasRef} /></div>
-			<div className="generation-label"><span className="signal" />{phase === "typing" ? "awaiting seed" : phase === "generating" ? "building terrain..." : "world generated"}</div>
+			<div className="seed-console"><span className="prompt">seed://</span><span>{displayedSeed}</span><span className="cursor" />{visualPhase === "ready" && <span className="status">locked</span>}</div>
+			<div className="world-stage">
+				<svg className="world-map" viewBox="0 0 460 250" aria-hidden="true">
+					<defs><pattern id="world-grid" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0H0V34" fill="none" stroke="#bfd1c2" strokeWidth="1" /></pattern></defs>
+					<rect className="grid-background" x="28" y="18" width="404" height="214" rx="8" />
+					<rect className="grid-lines" x="28" y="18" width="404" height="214" rx="8" />
+					{world.trees.map((tree) => <rect className="map-square" key={`square-${tree.x}-${tree.y}`} x={tree.x - 6} y={tree.y - 6} width="12" height="12" rx="2" style={{ "--detail-delay": `${tree.delay}ms` }} />)}
+					{world.ponds.map((pond) => <circle className="map-circle" key={`circle-${pond.x}-${pond.y}`} cx={pond.x} cy={pond.y} r="7" style={{ "--detail-delay": `${pond.delay}ms` }} />)}
+					{world.animals.map((animal) => <path className="map-triangle" key={`triangle-${animal.x}-${animal.y}`} d={`M${animal.x} ${animal.y - 8}L${animal.x + 8} ${animal.y + 7}L${animal.x - 8} ${animal.y + 7}Z`} style={{ "--detail-delay": `${animal.delay}ms` }} />)}
+				</svg>
+			</div>
+			<div className="generation-label"><span className="signal" />{visualPhase === "typing" ? "awaiting seed" : visualPhase === "generating" ? "building terrain..." : "world generated"}</div>
 		</div>
 	);
 }
