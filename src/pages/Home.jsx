@@ -79,9 +79,9 @@ function ProceduralVisualizer() {
 		const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 		const world = new THREE.Group();
 		const details = new THREE.Group();
-	// Convert seed string to a numeric value for seeding randomness
-	const seedValue = [...seed].reduce((total, character) => total + character.charCodeAt(0), 0);
-	// Handle canvas resize and maintain correct aspect ratio
+		// Convert seed string to a numeric value for seeding randomness
+		const seedValue = [...seed].reduce((total, character) => total + character.charCodeAt(0), 0);
+		// Handle canvas resize and maintain correct aspect ratio
 		const resize = () => {
 			const { width, height } = canvas.getBoundingClientRect();
 			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -106,10 +106,10 @@ function ProceduralVisualizer() {
 			const y = positions.getY(index);
 			const z = positions.getZ(index);
 			// Generate procedural noise per vertex based on position and seed
-		const noise = Math.sin(x * 5 + seedValue) * Math.cos(y * 6 - seedValue) + Math.sin(z * 8 + seedValue * 0.3);
-		const elevation = noise / 3;
-		// Color vertices based on elevation: blue for water, coral for mountains, green for land
-		const color = elevation < -0.12 ? new THREE.Color("#548c91") : elevation > 0.22 ? new THREE.Color("#d7835b") : new THREE.Color("#6d9972");
+			const noise = Math.sin(x * 5 + seedValue) * Math.cos(y * 6 - seedValue) + Math.sin(z * 8 + seedValue * 0.3);
+			const elevation = noise / 3;
+			// Color vertices based on elevation: blue for water, coral for mountains, green for land
+			const color = elevation < -0.12 ? new THREE.Color("#548c91") : elevation > 0.22 ? new THREE.Color("#d7835b") : new THREE.Color("#6d9972");
 			colors.push(color.r, color.g, color.b);
 		}
 		globeGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
@@ -212,10 +212,9 @@ function ProceduralVisualizer() {
 			setPhase("typing");
 			typeSeed();
 		}, 380);
-	return () => clearTimeout(timeout);
+		return () => clearTimeout(timeout);
 	}, [seed]);
 
-	// Cycle through different seeds to show procedural variety
 	// Cycle through different seeds to demonstrate procedural variety
 	useEffect(() => {
 		const loop = setTimeout(() => setSeedIndex((current) => (current + 1) % seeds.length), 7800);
@@ -240,11 +239,6 @@ function Home() {
 					<span className="wordmark-mark" aria-hidden="true">✳</span>
 					gen<span>erative</span>
 				</a>
-				<div className="nav-links">
-					<a href="#definition">About</a>
-					<a href="#principles">Principles</a>
-					<a className="nav-cta" href="#explore">Explore <span aria-hidden="true">↗</span></a>
-				</div>
 			</nav>
 
 			<section className="hero" id="top">
