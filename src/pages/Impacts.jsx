@@ -2,14 +2,13 @@ const majorImpactCards = [
   {
     number: "01",
     label: "Economic impact",
-    title: "Efficiency scales faster than accountability.",
-    text: "Procedural systems can reduce production costs and speed up iteration, but they also risk turning value into volume. When cost savings are prioritized over local labor, craft, and long-term maintenance, the system may become profitable while becoming less sustainable.",
+    heading: "AI Developers",
+      text: <><b>Positive:</b> </>,
     metric: "Cost efficiency",
   },
   {
     number: "02",
     label: "Cultural impact",
-    title: "A repeating pattern can flatten a place’s identity.",
     text: "When outputs are generated from generalized rules, unique cultural memory can be replaced by familiar formulas. The result may feel polished and scalable, yet lose the local texture, contradictions, and human specificity that give a place its character.",
     metric: "Identity drift",
   },
@@ -19,6 +18,7 @@ const hypothesisCards = [
   {
     title: "Local labor gets displaced by automation",
     text: "As procedural tools become cheaper and faster, the value of slower, human-made production may be misunderstood as inefficient instead of culturally important.",
+    metric: "Labor displacement",
   },
   {
     title: "Markets reward sameness before originality",
@@ -68,7 +68,7 @@ function Impacts() {
 
             <div className="impact-card-body">
               <p className="impact-metric">{card.metric}</p>
-              <h3>{card.title}</h3>
+              {card.heading && <h2 className="impact-card-heading">{card.heading}</h2>}
               <p>{card.text}</p>
             </div>
           </article>
