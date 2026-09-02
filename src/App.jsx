@@ -1,8 +1,8 @@
-import Home from "./pages/Home";
+import Impacts from "./pages/Impacts";
 import "./App.css";
 
 function App() {
-  return <Home />;
+  return <Impacts />;
 }
 
 export default App;
