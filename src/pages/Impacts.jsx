@@ -3,7 +3,7 @@ const majorImpactCards = [
     number: "01",
     label: "Economic impact",
     heading: "AI Developers",
-      text: <><b>Positive:</b> </>,
+      text: <><b>Positive:</b> They will gain money because of the AI model.<br /> </>,
     metric: "Cost efficiency",
   },
   {
