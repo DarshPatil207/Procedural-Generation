@@ -1,38 +1,83 @@
+// Organize the main impact cards into reusable heading and text sections.
 const majorImpactCards = [
   {
     number: "01",
     label: "Economic impact",
-    heading: "AI Developers",
-      text: <><b>Positive:</b> They will gain money because of the AI model.<br /> </>,
+    sections: [
+      {
+        heading: "AI Developers",
+        text: <><b>Positive:</b> They will gain money because of the AI model.<br /><b>Negative:</b> There may be fewer human jobs available with AI doing most of the work.</>,
+      },
+      {
+        heading: "Game Developers",
+        text: <><b>Positive:</b> With AI that assists with procedural generation, game development becomes much easier.<br /><b>Negative:</b> They have to train the AI, and money is spent on trying to train the AI.</>,
+      },
+      {
+        heading: "Playtesters",
+        text: <><b>Positive:</b> They make money from playing games and providing feedback.<br /><b>Negative:</b> N/A</>,
+      },
+    ],
     metric: "Cost efficiency",
   },
   {
     number: "02",
     label: "Cultural impact",
-    text: "When outputs are generated from generalized rules, unique cultural memory can be replaced by familiar formulas. The result may feel polished and scalable, yet lose the local texture, contradictions, and human specificity that give a place its character.",
+    sections: [
+      {
+        heading: "AI Developers",
+        text: <><b>Positive:</b> AI developers will feel triumphant with the success of their product.<br /><b>Negative:</b> There would be more work for the developers to update and maintain the AI.</>,
+      },
+      {
+        heading: "Game Developers",
+        text: <><b>Positive:</b> Their work will become much easier, as it will be AI assisted.<br /><b>Negative:</b> With AI doing a large portion of the work, there will be a lack of creative identity within workers.</>,
+      },
+      {
+        heading: "Playtesters",
+        text: <><b>Positive:</b> Playtesters will be able to collaborate with the developers.<br /><b>Negative:</b> There is a slight chance of overworking and repetitive testing.</>,
+      },
+    ],
     metric: "Identity drift",
   },
 ];
 
+// Each hypothesis includes its own image so the visual matches the card topic.
 const hypothesisCards = [
   {
-    title: "Local labor gets displaced by automation",
-    text: "As procedural tools become cheaper and faster, the value of slower, human-made production may be misunderstood as inefficient instead of culturally important.",
-    metric: "Labor displacement",
+    title: "Procedural generation could increase the amount of energy usage.",
+    text: "Researchers estimate the the amount of electricity consumption used for procedural generation can produce around 50 million tons of C0₂.",
+    image: {
+      src: "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80",
+      alt: "Solar panels arranged across a landscape",
+    },
   },
   {
-    title: "Markets reward sameness before originality",
-    text: "A system optimized for reach may prefer repeatable results over distinctive ones, making novelty feel risky even when it is more meaningful.",
+    title: "Procedural generation could destroy habitats because of the need to mine for materials.",
+    text: "Mining operations for metals needed to produce computerscan lead to habitat disruption, affecting biodiveristy and indigenous communities.",
+    image: {
+      src: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",
+      alt: "Close-up of a computer circuit board",
+    },
   },
   {
-    title: "Communities lose authorship over place",
-    text: "If the rules are set elsewhere, local people may become consumers of a generated identity rather than collaborators in shaping it.",
+    title: "Procedural generation could reduce the amount of physical waste such as paper and physical models.",
+    text: "The usage of procedural generation caused a 60% reduction in the prototyping stage. The University of Southern California showed that using procedural generation reduced the waste of materials by 50%.",
+    image: {
+      src: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=80",
+      alt: "Sorted recyclable materials",
+    },
   },
   {
-    title: "Scale creates dependency, not resilience",
-    text: "Highly automated systems can expand quickly while becoming more fragile, especially when they depend on centralized infrastructure and narrow assumptions.",
+    title: "Procedural generation could disrupt natural systems due to carbon and heat emissions from overheated computers. ",
+    text: "Surface temperatures increased by an average of 3.6 degrees Fahrenheit after a data center started operations. In extreme cases, nearby temperatures increase by up to 16.4 degrees Fahrenheit.",
+    image: {
+      src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
+      alt: "Sunlight passing through a green forest",
+    },
   },
 ];
+
+// Keep the labels in the same order as the hypothesis cards below.
+const hypothesisTags = ["Energy systems", "Components", "Waste", "Energy systems"];
 
 function Impacts() {
   return (
@@ -49,12 +94,13 @@ function Impacts() {
         <div className="impact-header">
           <h1>Rules can shape<br />more than just form.</h1>
           <p className="impact-intro">
-            Procedural systems extend quickly across markets, cultures, and everyday life. Their benefits are real, but so are the risks when speed and scale are allowed to override context.
+            Procedural generation uses rules and algorithms to create content at scale. This can create many opportunities in video game creation, but we also have to consider the economic and cultural impacts of this technology. Another factor to consider is how it affects the environmant around us.
           </p>
         </div>
       </section>
 
       <section className="impact-grid major-impact-grid" aria-label="Major impact overview">
+        {/* Render each major impact from its data instead of repeating the card markup. */}
         {majorImpactCards.map((card, index) => (
           <article
             className="impact-card impact-card-major"
@@ -68,8 +114,12 @@ function Impacts() {
 
             <div className="impact-card-body">
               <p className="impact-metric">{card.metric}</p>
-              {card.heading && <h2 className="impact-card-heading">{card.heading}</h2>}
-              <p>{card.text}</p>
+              {card.sections.map((section) => (
+                <div className="impact-card-section" key={section.heading}>
+                  <h3 className="impact-card-heading">{section.heading}</h3>
+                  <p>{section.text}</p>
+                </div>
+              ))}
             </div>
           </article>
         ))}
@@ -82,18 +132,20 @@ function Impacts() {
         </div>
 
         <div className="impact-grid hypothesis-grid">
+          {/* The third card receives a small layout adjustment for visual alignment. */}
           {hypothesisCards.map((card, index) => (
             <article
-              className="impact-card impact-card-small"
+              className={`impact-card impact-card-small${index === 2 ? " impact-card-waste" : ""}`}
               key={card.title}
               style={{ "--delay": `${index * 120}ms` }}
             >
               <div className="impact-card-header">
                 <span className="impact-card-number">0{index + 1}</span>
-                <span className="impact-card-tag">Hypothesis</span>
+                <span className="impact-card-tag">{hypothesisTags[index]}</span>
               </div>
 
               <div className="impact-card-body">
+                <img className="hypothesis-card-image" src={card.image.src} alt={card.image.alt} />
                 <h3>{card.title}</h3>
                 <p>{card.text}</p>
               </div>
