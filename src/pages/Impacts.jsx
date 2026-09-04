@@ -87,6 +87,12 @@ function Impacts() {
           <span className="wordmark-mark" aria-hidden="true">✳</span>
           gen<span>erative</span>
         </a>
+        {/* These links navigate to the paths handled in App.jsx. */}
+        <div className="nav-links">
+          <a href="/">Home</a>
+          <a className="nav-active" href="/impacts">Impacts</a>
+          <a href="/solutions">Solutions</a>
+        </div>
       </nav>
 
       <section className="impact-hero" id="top">

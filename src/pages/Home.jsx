@@ -18,6 +18,7 @@ const concepts = [
 	},
 ];
 
+// Add or replace values here to change the seeds used by the animation.
 const seeds = ["10973442", "89237121", "97283718", "12345678", "87654321", "31415926", "27182818", "16180339", "14142135", "17320508"];
 
 // Turn a seed into repeatable 2D positions so every generated map is unique but reproducible
@@ -28,9 +29,10 @@ function createWorld(seed) {
 		return random / 233280;
 	};
 	return {
-		trees: Array.from({ length: 11 }, (_, index) => ({ x: 78 + nextRandom() * 290, y: 65 + nextRandom() * 138, delay: index * 65 })),
-		ponds: Array.from({ length: 3 }, (_, index) => ({ x: 95 + nextRandom() * 265, y: 76 + nextRandom() * 120, delay: index * 130 })),
-		animals: Array.from({ length: 4 }, (_, index) => ({ x: 88 + nextRandom() * 285, y: 75 + nextRandom() * 125, delay: index * 170 })),
+				// The delay values control the order: squares, circles, then triangles.
+				trees: Array.from({ length: 11 }, (_, index) => ({ x: 78 + nextRandom() * 290, y: 65 + nextRandom() * 138, delay: index * 65 })),
+				ponds: Array.from({ length: 3 }, (_, index) => ({ x: 95 + nextRandom() * 265, y: 76 + nextRandom() * 120, delay: 900 + index * 130 })),
+				animals: Array.from({ length: 4 }, (_, index) => ({ x: 88 + nextRandom() * 285, y: 75 + nextRandom() * 125, delay: 1400 + index * 170 })),
 	};
 }
 
@@ -66,7 +68,8 @@ function ProceduralVisualizer() {
 			}
 
 			// After seed is fully typed, transition to generation phase
-			setPhase("generating");
+							// Increase 2200ms to keep the generating phase on screen longer.
+							setPhase("generating");
 			timeout = setTimeout(() => {
 				setPhase("ready");
 				timeout = setTimeout(() => setSeedIndex((current) => (current + 1) % seeds.length), 1800);
@@ -104,6 +107,11 @@ function Home() {
 					<span className="wordmark-mark" aria-hidden="true">✳</span>
 					gen<span>erative</span>
 				</a>
+				<div className="nav-links">
+					<a className="nav-active" href="/">Home</a>
+					<a href="/impacts">Impacts</a>
+					<a href="/solutions">Solutions</a>
+				</div>
 			</nav>
 
 			<section className="hero" id="top">
