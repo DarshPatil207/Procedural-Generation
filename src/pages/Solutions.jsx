@@ -1,31 +1,23 @@
-// Edit these objects to change the three solution cards without changing the layout.
+// Edit these objects to change the three major cards without changing the layout.
 const solutionCards = [
 	{
 		number: "01",
-		title: "Set boundaries before you generate",
-		text: "Define what the system is allowed to make, change, and reuse before the first prompt or seed is written.",
-		outcome: "Clear creative direction",
+		label: "Possible Solutions",
+		title: "Eight Solutions Ranked",
+		text: <>1. Guaranteed Reward After a Certain Number of Tries (Pity System)<br />2. Playtesting With Diverse Players<br />3. Fairness Constraints (Minimum Guaranteed)<br />4. Post-Launch Data Analysis<br />5. Balancing Updates<br />6. Monitering System That Compensates For Extremely Bad Luck<br />7. Transparency About Randomness<br />8. Adding More Developers/Playtesters</>,
 	},
 	{
 		number: "02",
-		title: "Keep people in the loop",
-		text: "Use human review for meaningful decisions so generated content remains intentional, accountable, and legible.",
-		outcome: "Better decisions",
+		label: "Recommendation",
+		title: "Why One? Use Multiple!",
+		text: "A recommendation for society is to merge a few of the eight solutions together. The best ones would be the top 5 solutions.",
 	},
 	{
 		number: "03",
-		title: "Measure the hidden cost",
-		text: "Track energy, compute time, material use, and labor alongside output so efficiency is not the only definition of success.",
-		outcome: "Responsible scale",
+		label: "Effect of recommendation",
+		title: "Team Effort",
+		text: "With those five solutions, developers can attempt to make the game more fair, test it, release it, collect data, and fix issues over time. The reason only one solution won't work is because even though one single solution can fix one part of the problem, it will not fix the entire problem itself. For example, adding a pity system could save hours of non-stop playing, but won't solve how overpowered or strong an in-game item is. By mixing the top five, the developers will be able to fix many issues in the overall problem, not just a single part. This is important, as randomness can cause a fair deal or unfairness within a game.",
 	},
-];
-
-// Each item is: number, heading, and supporting description.
-const workflowSteps = [
-	["01", "Frame", "Name the goal, audience, and limits."],
-	["02", "Generate", "Let the system explore many possible paths."],
-	["03", "Review", "Test the result against human and environmental needs."],
-	["04", "Refine", "Keep what works and adjust the rules."],
 ];
 
 function Solutions() {
@@ -36,54 +28,44 @@ function Solutions() {
 					<span className="wordmark-mark" aria-hidden="true">✳</span>
 					gen<span>erative</span>
 				</a>
+				{/* These links use the pathname checks in App.jsx. */}
 				<div className="nav-links">
-					{/* These links use the pathname checks in App.jsx. */}
 					<a href="/">Home</a>
 					<a href="/impacts">Impacts</a>
 					<a className="nav-active" href="/solutions">Solutions</a>
 				</div>
 			</nav>
 
-			<section className="solutions-hero" id="top">
-				<div>
+			<section className="impact-hero solutions-hero" id="top">
+				<div className="solutions-hero-image">
+					<img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=85" alt="A team collaborating around data and technology in an office" />
+				</div>
+				<div className="solutions-hero-copy">
 					<p className="eyebrow"><span /> Practical solutions</p>
-					<h1>Make room for<br /><em>better rules.</em></h1>
-					<p className="hero-intro">Procedural generation is most useful when it expands human judgment instead of replacing it. These principles offer a way to build with more care at every stage.</p>
-					<a className="primary-button" href="#approach">Explore the approach <span aria-hidden="true">↘</span></a>
-				</div>
-				<div className="solution-console" aria-label="Solution principles preview">
-					<div className="solution-console-top"><span>FIELD NOTES / 04</span><span>READY TO APPLY</span></div>
-					<div className="solution-orbit" aria-hidden="true">
-						<span className="orbit-ring orbit-ring-one" /><span className="orbit-ring orbit-ring-two" />
-						<span className="orbit-core">care<br /><b>+</b><br />control</span>
-						<span className="orbit-node orbit-node-one">human</span><span className="orbit-node orbit-node-two">impact</span><span className="orbit-node orbit-node-three">scale</span>
-					</div>
-					<p className="solution-console-footer"><span className="signal" /> SYSTEMS ARE SHAPED BY THEIR CONSTRAINTS</p>
+					<h1>Better systems<br />start with <em>care.</em></h1>
+					<p className="impact-intro">Procedural generation can expand creative possibility while still respecting people, resources, and the world around us. These simple practices help keep that balance visible.</p>
 				</div>
 			</section>
 
-			<section className="solutions-approach" id="approach">
-				<div className="section-heading"><p className="section-kicker">A considered approach</p><h2>Technology works<br />better with <span>intent.</span></h2></div>
-				<div className="solution-card-grid">
-					{solutionCards.map((card) => <article className="solution-card" key={card.number}>
-						<div className="solution-card-top"><span>{card.number}</span><span className="solution-card-dot" /></div>
-						<div><h3>{card.title}</h3><p>{card.text}</p></div>
-						<strong>{card.outcome} <span aria-hidden="true">↗</span></strong>
-					</article>)}
-				</div>
+			<section className="major-impact-grid solutions-card-grid" aria-label="Solutions overview">
+				{solutionCards.map((card) => (
+					<article className="impact-card impact-card-major solution-card" key={card.number}>
+						<div className="impact-card-header">
+							<span className="impact-card-number">{card.number}</span>
+							<span className="impact-card-tag">{card.label}</span>
+						</div>
+						<div className="impact-card-body">
+							<p className="impact-metric">Start here</p>
+							<h3>{card.title}</h3>
+							<p>{card.text}</p>
+						</div>
+					</article>
+				))}
 			</section>
 
-			<section className="workflow-section" id="workflow">
-				<div className="workflow-intro"><p className="section-kicker">A repeatable loop</p><h2>Small checks.<br /><em>Stronger worlds.</em></h2><p>Build reflection into the process, not just the final result.</p></div>
-				<div className="workflow-list">
-					{workflowSteps.map(([number, title, text]) => <div className="workflow-step" key={number}><span className="workflow-number">{number}</span><h3>{title}</h3><p>{text}</p></div>)}
-				</div>
-			</section>
-
-			<section className="solutions-start" id="start">
-				<p className="section-kicker">The next iteration</p>
-				<div><h2>Start with one<br /><span>better question.</span></h2><p>Before adding more automation, ask what the system should make possible for people, places, and the future.</p></div>
-				<a className="primary-button" href="#top">Return to top <span aria-hidden="true">↑</span></a>
+			<section className="explore solutions-closing">
+				<div><p className="section-kicker">The next iteration</p><h2>Start with one<br /><em>better question.</em></h2></div>
+				<p>Before adding more automation, ask what the system should make possible for people, places, and the future.</p>
 			</section>
 
 			<footer className="footer"><span>GENERATIVE / SOLUTIONS</span><span>DESIGNING WITH CONSEQUENCE</span></footer>
