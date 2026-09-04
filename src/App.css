@@ -60,7 +60,7 @@ h1, h2, h3, p { margin: 0; } h1 { max-width: 650px; margin: 27px 0 26px; font-si
 .impact-card-major, .impact-card-small { min-height: 360px; }
 }
 
-/* Solutions page: a structured editorial layout that reuses the site's colors. */
+/* Solutions page: the main page layout and the shared site colors. */
 .solutions-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .8fr); gap: 8%; align-items: center; padding: 82px 0 108px; }
 .solutions-hero h1 { margin-bottom: 25px; }
 .solution-console { position: relative; height: 410px; overflow: hidden; padding: 22px; border: 1px solid #bccdc0; border-radius: 22px; background: #e5eee5; }
@@ -80,12 +80,18 @@ h1, h2, h3, p { margin: 0; } h1 { max-width: 650px; margin: 27px 0 26px; font-si
 .section-heading h2 { margin-top: 24px; }
 .section-heading h2 span { color: var(--green); }
 .solution-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+/* The first card spans the row but stays half-width for a centered feature card. */
 .solutions-card-grid .solution-card:first-child { grid-column: 1 / -1; width: 50%; justify-self: center; }
 .solution-card { min-height: 348px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 18px 18px; border: 1px solid var(--line); background: rgba(228,236,229,.55); }
+/* Keep the header at the top and center the variable-length content below it. */
+.solution-card .impact-card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; margin-top: 0; }
 .solution-card-top { display: flex; justify-content: space-between; color: var(--accent); font: 11px 'DM Mono', monospace; }
 .solution-card-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 .solution-card h3 { margin-bottom: 15px; font-size: 22px; line-height: 1.12; letter-spacing: -.05em; }
 .solution-card p, .workflow-intro > p:last-child, .solutions-start > div > p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+/* The list fills the recommendation card while collapsing to one column on mobile. */
+.solution-priority-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; margin: 22px 0 0; padding: 16px 0 0 25px; border-top: 1px solid var(--line); color: var(--green); font: 11px/1.45 'DM Mono', monospace; text-transform: uppercase; }
+.solution-priority-list li { padding-left: 4px; }
 .solution-card strong { color: var(--green); font: 11px 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; }
 .solution-card strong span { color: var(--accent); font-size: 16px; }
 .workflow-section { display: grid; grid-template-columns: .7fr 1.3fr; gap: 8%; margin-inline: -48px; padding-inline: 48px; background: var(--soft); }
@@ -109,6 +115,7 @@ h1, h2, h3, p { margin: 0; } h1 { max-width: 650px; margin: 27px 0 26px; font-si
 	.solution-card-grid, .workflow-list { grid-template-columns: 1fr; }
 	.solutions-card-grid .solution-card:first-child { width: 100%; }
 	.solution-card { min-height: 280px; }
+	.solution-priority-list { grid-template-columns: 1fr; }
 	.solutions-start .primary-button { width: fit-content; margin-top: 0; }
 }
 

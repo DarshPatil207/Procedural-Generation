@@ -1,8 +1,11 @@
-// Edit these objects to change the three major cards without changing the layout.
+// This array is the page's content model. Edit these values to change the cards
+// without changing the JSX layout below.
 const solutionCards = [
 	{
+		// The number and label appear in the card header.
 		number: "01",
 		label: "Possible Solutions",
+		// The title and text appear in the card body.
 		title: "Eight Solutions Ranked",
 		text: <>1. Guaranteed Reward After a Certain Number of Tries (Pity System)<br />2. Playtesting With Diverse Players<br />3. Fairness Constraints (Minimum Guaranteed)<br />4. Post-Launch Data Analysis<br />5. Balancing Updates<br />6. Monitering System That Compensates For Extremely Bad Luck<br />7. Transparency About Randomness<br />8. Adding More Developers/Playtesters</>,
 	},
@@ -11,6 +14,8 @@ const solutionCards = [
 		label: "Recommendation",
 		title: "Why One? Use Multiple!",
 		text: "A recommendation for society is to merge a few of the eight solutions together. The best ones would be the top 5 solutions.",
+		// Only this card has priorities, so the list is rendered conditionally below.
+		priorities: ["Guaranteed reward", "Diverse playtesting", "Fairness constraints", "Data analysis", "Balancing updates"],
 	},
 	{
 		number: "03",
@@ -42,12 +47,13 @@ function Solutions() {
 				</div>
 				<div className="solutions-hero-copy">
 					<p className="eyebrow"><span /> Practical solutions</p>
-					<h1>Better systems<br />start with <em>care.</em></h1>
-					<p className="impact-intro">Procedural generation can expand creative possibility while still respecting people, resources, and the world around us. These simple practices help keep that balance visible.</p>
+					<h1>Ethical concerns<br />need to be<em> considered.</em></h1>
+					<p className="impact-intro">Every innovation has its ethical concerns. Procedural generation is no different, and it has quite a few ethical concerns. But, the most important one to consider is probably fairness. This is because many people play video games, and they expect to be treated fairly. Even a small error in the programming may unintentionally cause the game to favor a certain play style.</p>
 				</div>
 			</section>
 
 			<section className="major-impact-grid solutions-card-grid" aria-label="Solutions overview">
+				{/* One reusable template creates every card from the data above. */}
 				{solutionCards.map((card) => (
 					<article className="impact-card impact-card-major solution-card" key={card.number}>
 						<div className="impact-card-header">
@@ -55,17 +61,22 @@ function Solutions() {
 							<span className="impact-card-tag">{card.label}</span>
 						</div>
 						<div className="impact-card-body">
-							<p className="impact-metric">Start here</p>
 							<h3>{card.title}</h3>
 							<p>{card.text}</p>
+							{/* If priorities are added to a card, show its numbered list. */}
+							{card.priorities && (
+								<ol className="solution-priority-list">
+									{card.priorities.map((priority) => <li key={priority}>{priority}</li>)}
+								</ol>
+							)}
 						</div>
 					</article>
 				))}
 			</section>
 
 			<section className="explore solutions-closing">
-				<div><p className="section-kicker">The next iteration</p><h2>Start with one<br /><em>better question.</em></h2></div>
-				<p>Before adding more automation, ask what the system should make possible for people, places, and the future.</p>
+				<div><p className="section-kicker">The next iteration</p><h2>Start with one<br /><em>better solution.</em></h2></div>
+				<p>Before adding more automation, ask what the system should make possible for people, places, and the future. Ask the system to improve what already exists.</p>
 			</section>
 
 			<footer className="footer"><span>GENERATIVE / SOLUTIONS</span><span>DESIGNING WITH CONSEQUENCE</span></footer>

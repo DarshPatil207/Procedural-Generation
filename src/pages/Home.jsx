@@ -116,7 +116,7 @@ function Home() {
 
 			<section className="hero" id="top">
 				<div className="hero-copy">
-					<p className="eyebrow"><span /> A field guide to making by rules</p>
+					<p className="eyebrow"><span /> A field guide to making by rules - By Darsh Patil</p>
 					<h1>Let the <em>system</em><br />surprise you.</h1>
 					<p className="hero-intro">Procedural generation turns a handful of instructions, or a seed, into endless possibility. It is code as a collaborator: precise enough to guide, unpredictable enough to inspire.</p>
 					<a className="primary-button" href="#definition">Start with the idea <span aria-hidden="true">↓</span></a>
